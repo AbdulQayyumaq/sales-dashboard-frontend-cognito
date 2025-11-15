@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useAuth } from './hooks/useAuth'
 import ProtectedRoute from './components/ProtectedRoute'
 import Header from './components/Header'
 import LeaderboardTable from './components/LeaderboardTable'
@@ -17,13 +18,15 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [lastUpdated, setLastUpdated] = useState(new Date())
+  const { user } = useAuth()
 
   const fetchData = async (site: string) => {
     try {
-      const [leaderboardRes, districtsRes, meRes] = await Promise.all([
+      const agentName = user?.name || ''
+      const agentEmail = (user as any)?.email || ''
+      const [leaderboardRes, districtsRes] = await Promise.all([
         fetch(`/api/leaderboard`, { credentials: 'include' }),
-        fetch(`/api/districts`, { credentials: 'include' }),
-        fetch(`/api/me/${encodeURIComponent(process.env.NEXT_PUBLIC_CURRENT_USER_AGENT_ID || '')}`, { credentials: 'include' })
+        fetch(`/api/districts`, { credentials: 'include' })
       ])
 
       if (!leaderboardRes.ok) {
@@ -34,8 +37,16 @@ export default function Home() {
       } else {
         setDistricts(null)
       }
-      if (meRes.ok) {
-        setAgentStats(await meRes.json())
+      if (agentName || agentEmail) {
+        const params = new URLSearchParams()
+        if (agentName) params.set('name', agentName)
+        if (agentEmail) params.set('email', agentEmail)
+        const byNameRes = await fetch(`/api/me/by-name?${params.toString()}`, { credentials: 'include' })
+        if (byNameRes.ok) {
+          setAgentStats(await byNameRes.json())
+        } else {
+          setAgentStats(null)
+        }
       } else {
         setAgentStats(null)
       }
