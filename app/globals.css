@@ -1,0 +1,163 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  body {
+    @apply bg-gradient-to-br from-secondary-50 to-secondary-100 min-h-screen;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-xl shadow-lg border border-secondary-200 p-6;
+  }
+  
+  .card-header {
+    @apply flex items-center justify-between mb-4;
+  }
+  
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .badge-success {
+    @apply bg-success-100 text-success-800;
+  }
+  
+  .badge-warning {
+    @apply bg-warning-100 text-warning-800;
+  }
+  
+  .badge-danger {
+    @apply bg-danger-100 text-danger-800;
+  }
+  
+  .badge-primary {
+    @apply bg-primary-100 text-primary-800;
+  }
+  
+  .btn {
+    @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200;
+  }
+  
+  .btn-primary {
+    @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary-600 text-white hover:bg-secondary-700 focus:ring-secondary-500;
+  }
+  
+  .leaderboard-row {
+    @apply flex items-center justify-between p-4 bg-white rounded-lg shadow-sm border border-secondary-200 hover:shadow-md transition-shadow duration-200;
+  }
+  
+  .leaderboard-row.highlighted {
+    @apply ring-2 ring-primary-500 bg-primary-50 animate-glow;
+  }
+  
+  .rank-badge {
+    @apply flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm;
+  }
+  
+  .rank-1 {
+    @apply bg-gradient-to-r from-yellow-400 to-yellow-600 text-yellow-900;
+  }
+  
+  .rank-2 {
+    @apply bg-gradient-to-r from-gray-300 to-gray-500 text-gray-900;
+  }
+  
+  .rank-3 {
+    @apply bg-gradient-to-r from-amber-600 to-amber-800 text-amber-100;
+  }
+  
+  .rank-other {
+    @apply bg-secondary-200 text-secondary-700;
+  }
+  
+  .trophy-icon {
+    @apply text-yellow-500;
+  }
+  
+  .fire-particle {
+    @apply absolute w-1 h-1 bg-primary-500 rounded-full opacity-60;
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  .stats-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6;
+  }
+  
+  .metric-card {
+    @apply bg-white rounded-lg p-6 shadow-sm border border-secondary-200;
+  }
+  
+  .metric-value {
+    @apply text-3xl font-bold text-secondary-900;
+  }
+  
+  .metric-label {
+    @apply text-sm font-medium text-secondary-600 uppercase tracking-wide;
+  }
+  
+  .metric-change {
+    @apply text-sm font-medium;
+  }
+  
+  .metric-change.positive {
+    @apply text-success-600;
+  }
+  
+  .metric-change.negative {
+    @apply text-danger-600;
+  }
+  
+  .loading-spinner {
+    @apply animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent;
+  }
+  
+  .fire-glow {
+    box-shadow: 0 0 20px rgba(237, 116, 32, 0.3);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+    opacity: 0.8;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
