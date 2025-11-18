@@ -1,0 +1,28 @@
+{
+  "aws": {
+    "profile": "cervont",
+    "region": "us-east-1"
+  },
+  "s3": {
+    "bucket": "salesgames-cervontcare-com",
+    "website_endpoint": "salesgames-cervontcare-com.s3-website-us-east-1.amazonaws.com"
+  },
+  "cloudfront": {
+    "distribution_id": "E1C6PZA0JN3AAN",
+    "domain_name": "d209uj74yd2jei.cloudfront.net",
+    "custom_domain": "salesgames.cervontcare.com"
+  },
+  "build": {
+    "output_dir": "out",
+    "build_command": "npm run build",
+    "export_command": "npm run export"
+  },
+  "deployment": {
+    "sync_delete": true,
+    "cache_control": {
+      "html": "no-cache",
+      "static": "max-age=31536000",
+      "assets": "max-age=31536000"
+    }
+  }
+}

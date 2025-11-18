@@ -12,7 +12,7 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
-  const { login } = useAuth()
+  const { loginWithCredentials } = useAuth()
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,7 +21,7 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      await login(email, password)
+      await loginWithCredentials(email, password)
       router.push('/')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed')
@@ -50,7 +50,8 @@ export default function LoginPage() {
 
         {/* Login Form */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
             {/* Error Message */}
             {error && (
               <div className="bg-danger-50 border border-danger-200 rounded-lg p-4 flex items-center space-x-2">
@@ -137,25 +138,19 @@ export default function LoginPage() {
                 <span>Sign In</span>
               )}
             </button>
-          </form>
-
-          {/* Demo Credentials */}
-          <div className="mt-6 pt-6 border-t border-secondary-200">
-            <p className="text-center text-sm text-secondary-600 mb-3">
-              Demo credentials:
-            </p>
-            <div className="bg-secondary-50 rounded-lg p-3 text-sm text-secondary-700">
-              <p><strong>Email:</strong> admin@company.com</p>
-              <p><strong>Password:</strong> demo123</p>
-            </div>
+            </form>
           </div>
+
+          <br />
+          <br />
+          
         </div>
 
         {/* Footer */}
         <div className="text-center mt-6">
           <p className="text-sm text-secondary-500">
             Don't have an account?{' '}
-            <a href="#" className="text-primary-600 hover:text-primary-500 font-medium">
+            <a href="https://cervont.com/#contact" className="text-primary-600 hover:text-primary-500 font-medium" target="_blank" rel="noopener noreferrer">
               Contact your administrator
             </a>
           </p>

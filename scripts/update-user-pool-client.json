@@ -1,0 +1,23 @@
+{
+  "UserPoolId": "us-east-1_Ekr0Fg6xJ",
+  "ClientId": "62ua8j7k3svfqka13bv9f7kakm",
+  "AllowedOAuthFlowsUserPoolClient": true,
+  "AllowedOAuthFlows": ["code"],
+  "AllowedOAuthScopes": ["openid", "email", "profile"],
+  "SupportedIdentityProviders": ["COGNITO"],
+  "CallbackURLs": [
+    "http://localhost:3000/callback",
+    "http://localhost:3001/callback",
+    "https://salesgames.cervontcare.com/callback"
+  ],
+  "LogoutURLs": [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "https://salesgames.cervontcare.com"
+  ],
+  "ExplicitAuthFlows": [
+    "ALLOW_REFRESH_TOKEN_AUTH",
+    "ALLOW_USER_PASSWORD_AUTH",
+    "ALLOW_USER_SRP_AUTH"
+  ]
+}

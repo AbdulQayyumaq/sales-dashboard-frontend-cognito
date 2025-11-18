@@ -3,13 +3,10 @@
 import { useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { format } from 'date-fns'
-import { 
-  RefreshCw, 
-  MapPin, 
-  Clock, 
-  Settings, 
+import {
+  RefreshCw,
+  Clock,
   Bell,
-  ChevronDown,
   Trophy,
   Zap,
   LogOut
@@ -23,25 +20,25 @@ interface HeaderProps {
   onRefresh: () => void
 }
 
-const SITES = [
-  { code: 'phoenix', name: 'Phoenix', timezone: 'MST' },
-  { code: 'denver', name: 'Denver', timezone: 'MST' },
-  { code: 'atlanta', name: 'Atlanta', timezone: 'EST' },
-  { code: 'chicago', name: 'Chicago', timezone: 'CST' },
-]
+// Site/location selector removed per requirements
 
-export default function Header({ 
-  selectedSite, 
-  onSiteChange, 
-  lastUpdated, 
-  isRefreshing, 
-  onRefresh 
+export default function Header({
+  selectedSite,
+  onSiteChange,
+  lastUpdated,
+  isRefreshing,
+  onRefresh
 }: HeaderProps) {
-  const { logout } = useAuth()
-  const [showSiteDropdown, setShowSiteDropdown] = useState(false)
+  const { logout, user } = useAuth()
   const [showNotifications, setShowNotifications] = useState(false)
 
-  const currentSite = SITES.find(site => site.code === selectedSite) || SITES[0]
+  const initials = String(user?.name || 'A')
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
+
 
   return (
     <header className="bg-white shadow-lg border-b border-secondary-200">
@@ -64,48 +61,8 @@ export default function Header({
             </div>
           </div>
 
-          {/* Center - Site Selector */}
-          <div className="flex items-center space-x-6">
-            {/* Site Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setShowSiteDropdown(!showSiteDropdown)}
-                className="flex items-center space-x-2 px-4 py-2 bg-secondary-50 hover:bg-secondary-100 rounded-lg transition-colors duration-200 border border-secondary-200"
-              >
-                <MapPin className="h-4 w-4 text-secondary-600" />
-                <span className="font-medium text-secondary-900">
-                  {currentSite.name}
-                </span>
-                <span className="text-xs text-secondary-500 bg-secondary-200 px-2 py-1 rounded">
-                  {currentSite.timezone}
-                </span>
-                <ChevronDown className={`h-4 w-4 text-secondary-600 transition-transform duration-200 ${
-                  showSiteDropdown ? 'rotate-180' : ''
-                }`} />
-              </button>
-
-              {showSiteDropdown && (
-                <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-secondary-200 z-50">
-                  <div className="py-2">
-                    {SITES.map((site) => (
-                      <button
-                        key={site.code}
-                        onClick={() => {
-                          onSiteChange(site.code)
-                          setShowSiteDropdown(false)
-                        }}
-                        className="w-full text-left px-4 py-2 hover:bg-secondary-50 transition-colors duration-200 flex items-center justify-between"
-                      >
-                        <span className="font-medium">{site.name}</span>
-                        <span className="text-xs text-secondary-500">{site.timezone}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Live Indicator */}
+          {/* Center - Live Indicator */}
+          <div className="flex items-center">
             <div className="flex items-center space-x-2 px-3 py-2 bg-success-50 rounded-lg border border-success-200">
               <div className="w-2 h-2 bg-success-500 rounded-full animate-pulse" />
               <span className="text-sm font-medium text-success-700">LIVE</span>
@@ -188,46 +145,74 @@ export default function Header({
               )}
             </div>
 
-            {/* Settings */}
-            <button className="p-2 text-secondary-600 hover:text-secondary-900 hover:bg-secondary-100 rounded-lg transition-colors duration-200">
-              <Settings className="h-5 w-5" />
-            </button>
+            {/* Logged-in Agent */}
+            {/* Compact Modernized Agent Profile */}
+            <div className="hidden sm:flex items-center gap-2 px-3 py-2
+                bg-white/80 hover:bg-white
+                backdrop-blur-sm rounded-xl
+                border border-secondary-200/50 hover:border-secondary-300/70
+                shadow-sm hover:shadow-md
+                transition-all duration-300 ease-out
+                cursor-default min-w-0">
+
+              {/* Compact Avatar with Status */}
+              <div className="relative flex-shrink-0">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 
+                    flex items-center justify-center
+                    ring-2 ring-white shadow-sm
+                    transition-transform duration-300">
+                  <span className="text-white text-[11px] font-bold">
+                    {initials}
+                  </span>
+                </div>
+                {/* Smaller Pulsing Status Indicator */}
+                <span className="absolute -bottom-0.5 -right-0.5 flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-success-500 ring-2 ring-white"></span>
+                </span>
+              </div>
+
+              {/* User Info */}
+              <div className="flex flex-col min-w-0">
+                <span className="text-xs font-semibold text-secondary-900 truncate">
+                  {user?.name || 'Agent'}
+                </span>
+                <div className="flex items-center gap-1 mt-0.5">
+                  <span className="text-[10px] font-medium text-success-600">Online</span>
+                </div>
+              </div>
+            </div>
 
             {/* Logout Button */}
-            <button 
+            <button
               onClick={logout}
-              className="flex items-center space-x-2 px-3 py-2 bg-danger-50 hover:bg-danger-100 text-danger-700 rounded-lg transition-colors duration-200 border border-danger-200"
+              className="group flex items-center gap-2 px-4 py-2.5
+             bg-danger-50 hover:bg-danger-100 
+             text-danger-700 hover:text-danger-800 
+             rounded-xl border border-danger-200 hover:border-danger-300
+             shadow-sm hover:shadow-md 
+             transition-all duration-300 ease-out
+             hover:-translate-y-0.5 active:scale-95
+             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger-500/40"
             >
-              <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline font-medium">Logout</span>
+              <LogOut className="h-4 w-4 transition-transform duration-300 
+                     group-hover:scale-110 group-hover:rotate-12" />
+              <span className="hidden sm:inline font-semibold text-sm">
+                Logout
+              </span>
             </button>
+
           </div>
         </div>
       </div>
 
-      {/* Mobile Site Selector */}
-      <div className="sm:hidden px-4 pb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <MapPin className="h-4 w-4 text-secondary-600" />
-            <span className="font-medium text-secondary-900">{currentSite.name}</span>
-            <span className="text-xs text-secondary-500 bg-secondary-200 px-2 py-1 rounded">
-              {currentSite.timezone}
-            </span>
-          </div>
-          <div className="flex items-center space-x-2 text-sm text-secondary-600">
-            <Clock className="h-4 w-4" />
-            <span suppressHydrationWarning>{format(lastUpdated, 'HH:mm')}</span>
-          </div>
-        </div>
-      </div>
+      {/* Mobile site/location removed */}
 
       {/* Click outside handlers */}
-      {(showSiteDropdown || showNotifications) && (
-        <div 
-          className="fixed inset-0 z-40" 
+      {(showNotifications) && (
+        <div
+          className="fixed inset-0 z-40"
           onClick={() => {
-            setShowSiteDropdown(false)
             setShowNotifications(false)
           }}
         />

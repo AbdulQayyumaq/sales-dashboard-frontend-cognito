@@ -34,11 +34,13 @@ export function useApi<T>(endpoint: string, options?: {
         apiBaseUrl: API_BASE_URL
       })
       
+      const token = typeof window !== 'undefined' ? window.localStorage.getItem('access_token') || '' : ''
       const response = await fetch(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         mode: endpoint.startsWith('/api/') ? 'same-origin' : 'cors',
       })

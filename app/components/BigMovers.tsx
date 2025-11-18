@@ -82,7 +82,7 @@ function MoverCard({ agent }: MoverCardProps) {
 }
 
 export default function BigMovers() {
-  const { data, loading, error } = useApi<BigMoversResponse>('/api/big-movers')
+  const { data, loading, error } = useApi<BigMoversResponse>('/big-movers')
 
   // Debug logging for BigMovers
   useEffect(() => {

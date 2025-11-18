@@ -1,30 +1,24 @@
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
+import { CognitoIdentityProviderClient, GetUserCommand } from '@aws-sdk/client-cognito-identity-provider'
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const url = new URL(request.url)
-    const agentId = url.searchParams.get('agentId') || process.env.NEXT_PUBLIC_CURRENT_USER_AGENT_ID || ''
-
-    const API_URL = process.env.NEXT_PUBLIC_API_URL
-    if (!API_URL) {
-      return NextResponse.json({ error: 'NEXT_PUBLIC_API_URL is not set' }, { status: 500 })
+    const accessToken = cookies().get('accessToken')?.value || ''
+    const region = process.env.COGNITO_REGION
+    if (!accessToken || !region) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    if (!agentId) {
-      return NextResponse.json({ error: 'agentId is required' }, { status: 400 })
+    const client = new CognitoIdentityProviderClient({ region })
+    const userRes = await client.send(new GetUserCommand({ AccessToken: accessToken }))
+    const attrs = Object.fromEntries((userRes.UserAttributes || []).map(a => [String(a.Name), String(a.Value)]))
+    const user = {
+      id: attrs['sub'] || '',
+      name: attrs['name'] || attrs['email'] || '',
+      email: attrs['email'] || '',
     }
-
-    const upstream = await fetch(`${API_URL}/me/${encodeURIComponent(agentId)}`, {
-      headers: { 'Content-Type': 'application/json' },
-      cache: 'no-store',
-    })
-
-    if (!upstream.ok) {
-      return NextResponse.json({ error: 'Failed to fetch agent stats' }, { status: upstream.status })
-    }
-
-    const data = await upstream.json()
-    return NextResponse.json(data)
+    return NextResponse.json({ user })
   } catch (err: any) {
-    return NextResponse.json({ error: err?.message || 'Unexpected error' }, { status: 500 })
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 }

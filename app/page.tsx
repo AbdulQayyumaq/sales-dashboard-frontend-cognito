@@ -23,10 +23,10 @@ export default function Home() {
   const fetchData = async (site: string) => {
     try {
       const agentName = user?.name || ''
-      const agentEmail = (user as any)?.email || ''
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || ''
       const [leaderboardRes, districtsRes] = await Promise.all([
-        fetch(`/api/leaderboard`, { credentials: 'include' }),
-        fetch(`/api/districts`, { credentials: 'include' })
+        fetch(`${apiBase}/leaderboard`),
+        fetch(`${apiBase}/districts`)
       ])
 
       if (!leaderboardRes.ok) {
@@ -37,23 +37,41 @@ export default function Home() {
       } else {
         setDistricts(null)
       }
-      if (agentName || agentEmail) {
-        const params = new URLSearchParams()
-        if (agentName) params.set('name', agentName)
-        if (agentEmail) params.set('email', agentEmail)
-        const byNameRes = await fetch(`/api/me/by-name?${params.toString()}`, { credentials: 'include' })
-        if (byNameRes.ok) {
-          setAgentStats(await byNameRes.json())
-        } else {
-          setAgentStats(null)
-        }
-      } else {
-        setAgentStats(null)
-      }
+      setAgentStats(null)
 
       const response = leaderboardRes
       const result = await response.json()
-      setData(result)
+      const leaders = Array.isArray(result.leaders)
+        ? result.leaders
+        : Array.isArray(result.agents)
+          ? result.agents.map((agent: any) => ({
+              ...agent,
+              weekly_sales: agent.sales || 0
+            }))
+          : []
+      const normalized = {
+        ...result,
+        leaders,
+        total_agents: typeof result.total_agents === 'number' ? result.total_agents : leaders.length
+      }
+      setData(normalized)
+      if (agentName) {
+        const me = (normalized.leaders || []).find((a: any) => (
+          String((a.name || a.agent_name || '')).toLowerCase() === String(agentName).toLowerCase()
+        ))
+        const derivedId = `${String(agentName).trim().toLowerCase().replace(/\s+/g, '_')}_001`
+        const meId = me?.agent_id || derivedId
+        const token = typeof window !== 'undefined' ? window.localStorage.getItem('access_token') || '' : ''
+        const apiBase = process.env.NEXT_PUBLIC_API_URL || ''
+        if (meId && apiBase && token) {
+          const meRes = await fetch(`${apiBase}/me/${meId}`, {
+            headers: { Authorization: `Bearer ${token}`, 'Accept': 'application/json' }
+          })
+          if (meRes.ok) {
+            setAgentStats(await meRes.json())
+          }
+        }
+      }
       setLastUpdated(new Date())
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -66,6 +84,13 @@ export default function Home() {
   useEffect(() => {
     fetchData(selectedSite)
   }, [selectedSite])
+
+  useEffect(() => {
+    if (!user) return
+    // Re-fetch agent stats when user becomes available or changes
+    fetchData(selectedSite)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user])
 
   const handleRefresh = () => {
     setIsRefreshing(true)
@@ -124,7 +149,7 @@ export default function Home() {
                     <div className="text-3xl font-bold text-secondary-900">
                       {(() => {
                         const meId = agentStats?.agent_id
-                        const rank = data.leaders.find(a => a.agent_id === meId)?.rank
+                        const rank = (data?.leaders || []).find(a => a.agent_id === meId)?.rank
                         return rank ? `#${rank}` : '#--'
                       })()}
                     </div>
