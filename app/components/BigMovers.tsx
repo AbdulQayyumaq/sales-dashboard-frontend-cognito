@@ -81,8 +81,8 @@ function MoverCard({ agent }: MoverCardProps) {
   )
 }
 
-export default function BigMovers() {
-  const { data, loading, error } = useApi<BigMoversResponse>('/big-movers')
+export default function BigMovers({ site = 'all' }: { site?: string }) {
+  const { data, loading, error } = useApi<BigMoversResponse>(`/big-movers?site=${encodeURIComponent(site)}&days=7&limit=10&threshold=10`, { dependencies: [site] })
 
   // Debug logging for BigMovers
   useEffect(() => {

@@ -59,8 +59,7 @@ export default function Home() {
         const me = (normalized.leaders || []).find((a: any) => (
           String((a.name || a.agent_name || '')).toLowerCase() === String(agentName).toLowerCase()
         ))
-        const derivedId = `${String(agentName).trim().toLowerCase().replace(/\s+/g, '_')}_001`
-        const meId = me?.agent_id || derivedId
+        const meId = me?.agent_id || ''
         const token = typeof window !== 'undefined' ? window.localStorage.getItem('access_token') || '' : ''
         const apiBase = process.env.NEXT_PUBLIC_API_URL || ''
         if (meId && apiBase && token) {
@@ -70,6 +69,8 @@ export default function Home() {
           if (meRes.ok) {
             setAgentStats(await meRes.json())
           }
+        } else {
+          setAgentStats(null)
         }
       }
       setLastUpdated(new Date())
@@ -212,7 +213,7 @@ export default function Home() {
                 <LeaderboardTable agents={data.leaders.slice(0, 20)} loading={isLoading} error={null} updatedAt={lastUpdated} isRefreshing={isRefreshing} />
               </div>
               <div>
-                <BigMovers />
+                <BigMovers site={selectedSite} />
               </div>
             </div>
 
