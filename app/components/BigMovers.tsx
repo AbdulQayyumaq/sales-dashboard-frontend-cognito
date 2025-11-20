@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { TrendingUp, TrendingDown, Clock, AlertCircle } from 'lucide-react'
 import { BigMoversResponse } from '../types'
 import { useApi } from '../hooks/useApi'
@@ -81,8 +81,14 @@ function MoverCard({ agent }: MoverCardProps) {
   )
 }
 
-export default function BigMovers({ site = 'all' }: { site?: string }) {
-  const { data, loading, error } = useApi<BigMoversResponse>(`/big-movers?site=${encodeURIComponent(site)}&days=7&limit=10&threshold=10`, { dependencies: [site] })
+export default function BigMovers({ period = '7d' }: { period?: 'today' | 'yesterday' | '7d' | '30d' }) {
+  const days = period === '30d' ? 30 : 7
+  const endpoint = useMemo(() => `/big-movers?site=all&days=${days}&limit=10&threshold=10`, [days])
+  const { data, loading, error } = useApi<BigMoversResponse>(endpoint, { dependencies: [endpoint] })
+
+  useEffect(() => {
+    console.log('🔎 BigMovers Request URL:', endpoint)
+  }, [endpoint])
 
   // Debug logging for BigMovers
   useEffect(() => {
